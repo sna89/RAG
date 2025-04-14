@@ -1,4 +1,3 @@
 *.db
-*.docx
 .env
 .venv/**
