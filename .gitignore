@@ -1,0 +1,4 @@
+*.db
+*.docx
+.env
+.venv/**

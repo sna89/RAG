@@ -1,0 +1,178 @@
+{
+  "automobile": [
+    {
+      "question": "What was Karl Benz's contribution to early automobile manufacturing?",
+      "answer": "Karl Benz built the Patent-Motorwagen in 1885, widely recognized as the first practical automobile, using craft production methods in a small workshop in Mannheim, Germany."
+    },
+    {
+      "question": "How did Henry Ford revolutionize automobile manufacturing?",
+      "answer": "Henry Ford revolutionized automobile manufacturing by implementing the moving assembly line in 1913, which drastically reduced production time and enabled mass production."
+    },
+    {
+      "question": "What was the impact of the Toyota Production System?",
+      "answer": "The Toyota Production System introduced lean production principles like just-in-time inventory, kaizen (continuous improvement), and built-in quality, which improved efficiency and quality while reducing costs."
+    },
+    {
+      "question": "How did global expansion change automobile production in the 1990s and 2000s?",
+      "answer": "Global expansion led to modularization and flexible manufacturing, with components produced in multiple countries and the rise of production in emerging markets like China."
+    },
+    {
+      "question": "What role does digital technology play in modern automobile manufacturing?",
+      "answer": "Digital technology enables smart factories with connected systems, AI, collaborative robots, and additive manufacturing, transforming production efficiency and customization."
+    }
+  ],
+  "food": [
+    {
+      "question": "Who developed the canning process, and why was it important?",
+      "answer": "Nicolas Appert developed the canning process in 1809 to preserve food for military use, laying the foundation for modern food preservation techniques."
+    },
+    {
+      "question": "What technological innovation did Clarence Birdseye pioneer?",
+      "answer": "Clarence Birdseye pioneered flash freezing and developed the multi-plate freezer in the 1920s, revolutionizing frozen food preservation."
+    },
+    {
+      "question": "How did food additives evolve in the post-war era?",
+      "answer": "Post-war food additives like artificial flavors and preservatives proliferated, with over 2,800 in use by the late 1970s, enabling long shelf life and standardization."
+    },
+    {
+      "question": "What role did biotechnology play in food manufacturing in the 1990s?",
+      "answer": "Biotechnology introduced genetically modified crops like herbicide-resistant soybeans, though faced consumer resistance and regulatory challenges."
+    },
+    {
+      "question": "How has food manufacturing addressed sustainability in recent years?",
+      "answer": "Food manufacturing has improved energy and water efficiency, used renewable packaging, reduced food waste, and implemented digital tools for traceability and optimization."
+    }
+  ],
+  "steel": [
+    {
+      "question": "What is the historical significance of the Bessemer process?",
+      "answer": "The Bessemer process, developed in 1856, enabled mass production of steel by blowing air through molten iron to remove impurities, drastically reducing costs and processing time."
+    },
+    {
+      "question": "What role did electric arc furnaces play in steel manufacturing?",
+      "answer": "Electric arc furnaces, commercially developed in the early 20th century, allowed high-temperature steel production from scrap metal, offering flexibility and efficiency."
+    },
+    {
+      "question": "Why was the open-hearth process significant?",
+      "answer": "The open-hearth process allowed better control of steel composition and used steel scrap, surpassing Bessemer output by the 1880s for high-quality steel."
+    },
+    {
+      "question": "What is continuous casting and why is it important?",
+      "answer": "Continuous casting, which became viable in the 1950s, allowed direct casting of molten steel into solid shapes, improving yield and reducing energy use."
+    },
+    {
+      "question": "What innovation allowed European expansion of steel production despite ore limitations?",
+      "answer": "The Thomas process, a variant of the Bessemer process with a basic lining, allowed use of high-phosphorus ores common in Europe."
+    }
+  ],
+  "textile": [
+    {
+      "question": "What did the spinning jenny and water frame enable?",
+      "answer": "These inventions enabled mechanized spinning, increasing thread production and driving the shift from home-based to factory textile production."
+    },
+    {
+      "question": "How did fast fashion change textile manufacturing?",
+      "answer": "Fast fashion introduced rapid design-to-shelf cycles and integrated supply chains, increasing production speed and responding quickly to consumer trends."
+    },
+    {
+      "question": "What was the significance of synthetic fibers like nylon and polyester?",
+      "answer": "Synthetic fibers offered durability and convenience, surpassing cotton in global use by 1968 and reshaping the textile industry."
+    },
+    {
+      "question": "What role did the 2013 Rana Plaza collapse play in the industry?",
+      "answer": "The disaster highlighted poor labor conditions in textile manufacturing and increased scrutiny of supply chains and labor practices."
+    },
+    {
+      "question": "How has digital technology impacted textile production?",
+      "answer": "Digital manufacturing technologies like automated systems and 3D printing have enabled more flexible, efficient, and localized textile production."
+    }
+  ],
+  "general": [
+    {
+      "question": "What common trend is seen in the evolution of manufacturing across industries?",
+      "answer": "All industries moved from manual, artisanal processes to mass production and later to automation and digital transformation."
+    },
+    {
+      "question": "How did World War II affect manufacturing sectors like food, steel, and textiles?",
+      "answer": "WWII spurred technological innovations and production scaling across industries to support military needs."
+    },
+    {
+      "question": "What is the role of globalization in modern manufacturing?",
+      "answer": "Globalization led to supply chain fragmentation, production offshoring, and emergence of new manufacturing hubs like China and India."
+    },
+    {
+      "question": "How has sustainability become a shared priority in modern manufacturing?",
+      "answer": "Industries are adopting energy-efficient processes, reducing waste, and prioritizing environmentally friendly materials."
+    },
+    {
+      "question": "What are the key digital tools adopted across sectors in the 21st century?",
+      "answer": "AI, automation, predictive analytics, and IoT are widely used to optimize production, quality control, and supply chain management."
+    }
+  ],
+  "not_in_documents": [
+    {
+      "question": "What are the effects of 3D-printed meat on the automotive industry?",
+      "answer": "The documents do not contain information about 3D-printed meat or its effects on the automotive industry."
+    },
+    {
+      "question": "How do textile dyes impact ocean coral reefs?",
+      "answer": "The provided documents do not discuss the specific environmental impacts of textile dyes on coral reefs."
+    },
+    {
+      "question": "What role does blockchain play in managing steel inventories?",
+      "answer": "There is no mention of blockchain technology in the steel manufacturing document."
+    },
+    {
+      "question": "How is vertical farming integrated into food factories?",
+      "answer": "The documents do not contain information about vertical farming integration into food factories."
+    },
+    {
+      "question": "What are the health risks of wearing synthetic textiles?",
+      "answer": "The documents do not provide information on health risks associated with synthetic textiles."
+    }
+  ],
+  "ambiguous": [
+    {
+      "question": "What is the most important innovation in all manufacturing sectors?",
+      "answer": "The documents cover many innovations across sectors, but do not specify which is the most important overall, making the answer ambiguous."
+    },
+    {
+      "question": "When exactly did globalization begin in manufacturing?",
+      "answer": "The documents describe globalization trends but do not pinpoint an exact starting date, making the answer ambiguous."
+    },
+    {
+      "question": "Which industry benefited the most from digital transformation?",
+      "answer": "Each document mentions digital transformation, but none compare industries to determine which benefited the most."
+    },
+    {
+      "question": "Is modern manufacturing more environmentally friendly than in the past?",
+      "answer": "The documents highlight sustainability efforts but do not provide a direct comparison across time to definitively answer this."
+    },
+    {
+      "question": "Which country currently leads in manufacturing innovation?",
+      "answer": "While the documents mention advancements in several countries, they do not specify which one leads overall, making the answer unclear."
+    }
+  ],
+  "off_topic": [
+    {
+      "question": "Who won the FIFA World Cup in 2018?",
+      "answer": "The documents do not contain information about football or the FIFA World Cup."
+    },
+    {
+      "question": "What are the best places to visit in Japan during spring?",
+      "answer": "Travel-related topics such as sightseeing in Japan are not discussed in the provided documents."
+    },
+    {
+      "question": "How does compound interest work in personal finance?",
+      "answer": "The documents do not provide any information about financial concepts like compound interest."
+    },
+    {
+      "question": "What is the current ranking of Novak Djokovic in tennis?",
+      "answer": "The documents do not include any information about tennis or player rankings."
+    },
+    {
+      "question": "Which cryptocurrency had the highest growth in 2023?",
+      "answer": "Cryptocurrencies and their market trends are not covered in the documents."
+    }
+  ]
+}
