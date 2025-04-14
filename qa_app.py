@@ -1,11 +1,12 @@
 import openai
 
-from llm.llm_helper import LLMChat
+from core.llm.llm_chat import LLMChat
 from query.prompts import RAG_PROMPT
 from query.query_helper import QueryHelper
-from rag.rag import RAG
+from rag.rag import RAG, initilize_rag_components
 from config import load_config
-from typing import List, Optional, Tuple, Dict, Any, Union
+from typing import List, Optional, Dict, Any, Union
+from langchain.retrievers.multi_query import MultiQueryRetriever
 
 TOPICS = ["food", "automobile", "steel", "textile"]
 GENERAL_TOPIC = "general"
@@ -30,13 +31,15 @@ class QAApp:
     def _initialize_components(self) -> None:
         """Initialize all required components for the QA system."""
 
-        env_config = self.config.get("env_config", {})
-        llm_config = self.config.get("llm_config", {})
-        rag_config = self.config.get("rag_config", {})
+        query_helper, embedding, vector_db = initilize_rag_components(self.config)
 
-        self.rag = RAG(env_config, llm_config, **rag_config)
+        self.rag = RAG(query_helper,
+                       embedding,
+                       vector_db,
+                       **self.config["rag_config"])
 
         # Create LLM instances
+        llm_config = self.config["core_config"]["llm_config"]
         self.qa_llm = LLMChat(**llm_config)
         self.query_llm = LLMChat(**llm_config)
 
@@ -87,6 +90,10 @@ class QAApp:
         """
         # Fix grammar and spelling in the query for improved retrieval and overall performance
         user_query = self.query_helper.fix_grammar_query(user_query)
+        # retriever_from_llm = MultiQueryRetriever.from_llm(
+        #     retriever=vectordb.as_retriever(), llm=llm
+        # )
+
         user_query_w_summary = user_query
 
         # Incorporate conversation history if available
@@ -95,14 +102,14 @@ class QAApp:
             user_query_w_summary = self.query_helper.combine_summary_query(conversation_history, user_query)
 
         # Check if query is ambiguous
-        is_ambiguous = self.query_helper.classify_ambiguous(
-            user_query_w_summary,
-            threshold=self.qa_config.get("ambiguous_threshold")
-        )
+        # is_ambiguous = self.query_helper.classify_ambiguous(
+        #     user_query_w_summary,
+        #     threshold=self.qa_config.get("ambiguous_threshold")
+        # )
 
-        if is_ambiguous:
-            return ("Can you please be more specific in your question "
-                    "and add details that will help me to better understand you?"), conversation_history
+        # if is_ambiguous:
+        #     return ("Can you please be more specific in your question "
+        #             "and add details that will help me to better understand you?"), conversation_history
 
         # Process non-ambiguous query
         results = self.rag.query_similarity(user_query_w_summary)

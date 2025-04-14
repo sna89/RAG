@@ -23,21 +23,28 @@ def load_config() -> Dict[str, Any]:
         "openai_api_key": os.getenv("OPENAI_API_KEY", ""),
     }
 
-    # RAG system configuration
-    rag_config = {
-        # "embedding_model": "sentence-transformers/all-MiniLM-l6-v2",
-        # embedding_model model: "intfloat/e5-small-v2",
-        "embedding_model": "text-embedding-ada-002",
-        "top_k": 10,
-        "persist_path": "persist.db",
-        "chunk_size": 1000,
-        "chunk_overlap": 200
+    core_config = {
+        "embedding_model": {
+            "provider": "openai",
+            "model_name": "text-embedding-ada-002"
+        },
+        # "huggingface": "sentence-transformers/all-MiniLM-l6-v2"
+
+        "llm_config": {
+            "model_name": "gpt-4o-mini",
+            "temperature": 0
+        },
+        "vector_db": {
+            "db_type": "chroma",
+            "persist_path": "persist.db",
+        }
     }
 
-    # LLM configuration
-    llm_config = {
-        "model_name": "gpt-4o-mini",
-        "temperature": 0
+    # RAG system configuration
+    rag_config = {
+        "top_k": 10,
+        "chunk_size": 1000,
+        "chunk_overlap": 200
     }
 
     # QA system configuration
@@ -54,7 +61,7 @@ def load_config() -> Dict[str, Any]:
     config = {
         "env_config": env_config,
         "rag_config": rag_config,
-        "llm_config": llm_config,
+        "core_config": core_config,
         "qa_config": qa_config,
         "data_path": os.path.join(".", "rag", "data_files"),
         "eval_config": eval_config

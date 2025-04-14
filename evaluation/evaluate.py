@@ -2,7 +2,7 @@ import json
 from typing import Dict, Any
 import os
 from config import load_config
-from llm.llm_helper import AzureLLMChat
+from core.llm.llm_chat import AzureLLMChat
 from qa_app import QAApp
 import pandas as pd
 from tqdm import tqdm

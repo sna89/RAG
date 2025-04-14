@@ -1,7 +1,6 @@
-import os
-from typing import Dict, List, Tuple, Any, Optional, Union
+from typing import Dict, List, Tuple, Any
 from langchain_openai import ChatOpenAI
-from llm.utils import count_tokens
+from core.llm.utils import count_tokens
 
 MAX_TOKENS = 4096
 DEFAULT_SYSTEM_PROMPT = "You are a helpful assistant."
@@ -27,7 +26,8 @@ class LLMChat:
         """
         self.model_name = model_name
 
-        self.llm = ChatOpenAI(model=self.model_name)
+        self.llm = ChatOpenAI(model=self.model_name,
+                              temperature=temperature)
 
         self.conversation_history = []
         self.initialize_history()

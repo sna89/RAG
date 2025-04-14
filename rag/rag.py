@@ -1,35 +1,28 @@
 import os
+
+import openai
 from langchain_unstructured import UnstructuredLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from config import load_config
-from llm.embedding.openai_embedding import OpenAIEmbeddingClient
-from langchain_community.vectorstores import FAISS
+from core.embedding.openai_embedding import OpenAIEmbeddingClient
+from core.embedding.embedding_client import EmbeddingClient
 from typing import List, Tuple, Optional, Any, Dict
 
-from llm.llm_helper import LLMChat
+from core.llm.llm_chat import LLMChat
+from core.vector_db.vector_db import VectorDB
 from query.query_helper import QueryHelper
 from langchain.schema import Document
 
 
 class RAG:
-    """
-   Retrieval Augmented Generation class for document indexing and similarity search.
-
-   This class handles:
-   - Document loading and chunking
-   - Vector database creation and management
-   - Document summarization at multiple levels
-   - Similarity search for queries
-   """
-
     def __init__(
             self,
-            env_config: Dict[str, Any] = None,
-            llm_config: Dict[str, Any] = None,
-            embedding_model: str = "text-embedding-ada-002",
+            query_helper: QueryHelper,
+            embedding: EmbeddingClient = EmbeddingClient,
+            vector_db: Any = None,
             top_k: int = 10,
-            persist_path: str = "../persist.db",
+            persist_path: str = "persist.db",
             chunk_size: int = 1000,
             chunk_overlap: int = 200,
     ):
@@ -38,22 +31,22 @@ class RAG:
         Initialize the RAG system.
 
         Args:
-            env_config: Environment configuration for LLM
-            llm_config: Configuration for LLM
-            embedding_model: Model name for embeddings
+            query_helper: query_helper for applying llm queries
+            embedding: Embedding client for transforming text to vector representation
+            vector_db: index vector_db for storing and retrieving embeddings
             top_k: Number of results to return in queries
             persist_path: Path to save/load the vector database
             chunk_size: Size of text chunks for splitting documents
             chunk_overlap: Overlap between chunks
         """
 
-        # Set default dicts if None
-        self.env_config = env_config or {}
-        self.llm_config = llm_config or {}
+        self.query_helper = query_helper
 
         # Initialize embedding client
-        self.embedding_model = embedding_model
-        self.embedding = OpenAIEmbeddingClient(self.embedding_model)
+        self.embedding = embedding
+
+        # initialize vector db
+        self.vector_db = vector_db
 
         # Set parameters
         self.top_k = top_k
@@ -64,10 +57,6 @@ class RAG:
         # Resolve persist path
         self.persist_path = persist_path
         self._resolve_persist_path()
-
-        # Initialize LLM components
-        self.query_llm = LLMChat(**self.llm_config)
-        self.query_helper = QueryHelper(self.query_llm)
 
         # Load existing database if it exists
         if os.path.exists(self.persist_path):
@@ -160,12 +149,13 @@ class RAG:
             doc_summary = self.query_helper.summarize_text(doc[0].page_content)
             summary_list.append(doc_summary)
 
-            doc_summary = Document(page_content=doc_summary, **{"metadata": doc[0].metadata})
+            doc_summary = Document(page_content=doc_summary, metadata={"filename": doc[0].metadata["filename"]})
             split_documents.extend([doc_summary])
 
         # Add root general summary to deal with general questions
         root_summary = self.query_helper.summarize_text("".join(summary_list))
-        doc_root_summary = Document(page_content=root_summary, **{"metadata": doc_list[0][0].metadata})
+        doc_root_summary = Document(page_content=root_summary,
+                                    metadata={"filename": doc_list[0][0].metadata["filename"]})
         split_documents.extend([doc_root_summary])
         return split_documents
 
@@ -176,16 +166,14 @@ class RAG:
         Args:
             split_documents: List of document chunks to index
         """
-        self.vector_store = FAISS.from_documents(split_documents,
-                                                 self.embedding.embeddings)
-        self.vector_store.save_local(self.persist_path)
+        self.vector_db.from_documents(split_documents, self.embedding.embeddings)
+        self.vector_store = self.vector_db.vector_store
 
     def _load_db(self) -> None:
         """Load the vector database from disk."""
 
-        self.vector_store = FAISS.load_local(self.persist_path,
-                                             self.embedding.embeddings,
-                                             allow_dangerous_deserialization=True)
+        self.vector_db.load_db(self.embedding.embeddings)
+        self.vector_store = self.vector_db.vector_store
 
     def add_documents(self, path: str) -> bool:
         """
@@ -235,15 +223,34 @@ class RAG:
             self.top_k = top_k
 
 
-# Need to consider how to delete old data
+def initilize_rag_components(config):
+    # Initialize LLM components
+    llm_config = config["core_config"]["llm_config"]
+    query_llm = LLMChat(**llm_config)
+    query_helper = QueryHelper(query_llm)
+
+    embedding = None
+    embedding_config = config["core_config"]["embedding_model"]
+    if embedding_config["provider"] == "openai":
+        embedding = OpenAIEmbeddingClient(embedding_config["model_name"])
+
+    vector_db_conf = config["core_config"]["vector_db"]
+    vector_db = VectorDB(**vector_db_conf)
+
+    return query_helper, embedding, vector_db
+
 
 if __name__ == "__main__":
     config = load_config()
-    rag_config = config["rag_config"]
-    env_config = config["env_config"]
-    llm_config = config["llm_config"]
 
-    rag = RAG(env_config, llm_config, **rag_config)
+    openai.api_key = config["env_config"]["openai_api_key"]
+    query_helper, embedding, vector_db = initilize_rag_components(config)
+
+    rag = RAG(query_helper,
+              embedding,
+              vector_db,
+              **config["rag_config"])
+
     rag.index_documents(r".\data_files", True)
     results = rag.query_similarity("When does the transformation started?")
     for result in results:

@@ -1,7 +1,8 @@
 from langchain_community.embeddings import HuggingFaceEmbeddings
+from core.embedding.embedding_client import EmbeddingClient
 
 
-class HuggingFaceEmbeddingClient:
+class HuggingFaceEmbeddingClient(EmbeddingClient):
     """
         Service for generating text embeddings using HuggingFace models.
     """
@@ -13,9 +14,17 @@ class HuggingFaceEmbeddingClient:
         Args:
             model_name (str): Name of the HuggingFace model to use for embeddings.
         """
+        super().__init__()
 
         self.model_name = model_name
-        self.embeddings = HuggingFaceEmbeddings(model_name=model_name)
+        self._embeddings = HuggingFaceEmbeddings(
+            model_name=model_name
+        )
+
+    @property
+    def embeddings(self):
+        """Return the HuggingFace embeddings instance."""
+        return self._embeddings
 
     def embed_text(self, text):
         """

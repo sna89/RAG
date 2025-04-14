@@ -1,12 +1,11 @@
-from typing import List, Any, Tuple, Optional
+from typing import List, Any
 
-from llm.llm_helper import MAX_TOKENS
-from llm.utils import count_tokens
+from core.llm.llm_chat import MAX_TOKENS
+from core.llm.utils import count_tokens
 from query.prompts import (
     TOPIC_CLASSIFICATION_PROMPT,
     AMBIGUOUS_PROMPT,
     SUMMARIZE_CONVERSATION_PROMPT,
-    SUMMARY_QUERY_COMBINE_PROMPT,
     GRAMMAR_FIX_PROMPT,
     LLM_AS_JUDGE_ACC_PROMPT, LLM_AS_JUDGE_REL_PROMPT, SUMMARIZE_DOCUMENT_PROMPT
 )
