@@ -1,8 +1,12 @@
 import json
 from typing import Dict, Any
 import os
+
+import openai
+from langchain_openai import ChatOpenAI
+
 from config import load_config
-from core.llm.llm_chat import AzureLLMChat
+from core.llm.llm_chat import LLMChat
 from qa_app import QAApp
 import pandas as pd
 from tqdm import tqdm
@@ -16,6 +20,7 @@ class Evaluator:
     """
         Class responsible for evaluating a QA system using ground truth data and LLM-based evaluation.
     """
+
     def __init__(self,
                  config: Dict[str, Any]):
         """Initialize the Evaluator with configuration settings.
@@ -23,10 +28,13 @@ class Evaluator:
         Args:
             config: Dictionary containing configuration parameters for evaluation
         """
-        env_config = config.get("env_config", {})
-        llm_config = config.get("llm_config", {})
 
-        self.query_llm = AzureLLMChat(**env_config, **llm_config)
+        self.config = config
+        self.llm_config = self.config["core_config"]["llm_config"]
+
+        openai.api_key = config["env_config"]["openai_api_key"]
+
+        self.query_llm = LLMChat(self.llm_config["model_name"], ChatOpenAI(**self.llm_config))
         self.query_helper = QueryHelper(self.query_llm)
 
         self.qa_app = QAApp(config)
@@ -58,7 +66,6 @@ class Evaluator:
 
     def evaluate(self):
         """Run the complete evaluation pipeline."""
-
         self.answer_questions()
         self.llm_as_a_judge_acc()
         self.llm_as_a_judge_relevance()
@@ -67,7 +74,7 @@ class Evaluator:
         """Process each question through the QA system and store the answers."""
 
         self.eval_df["QARagAnswer"] = \
-            self.eval_df.progress_apply(lambda row: self.qa_app.process_query(row["Question"],
+            self.eval_df.progress_apply(lambda row: self.qa_app.process_query(row["Question"].strip(),
                                                                               None,
                                                                               eval=True)[0],
                                         axis=1)

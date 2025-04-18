@@ -18,6 +18,9 @@ class VectorDB:
         self.persist_path = persist_path
         self._vector_store = None
 
+        if not os.path.exists(self.persist_path):
+            self.persist_path = os.path.join("..", self.persist_path)
+
     def from_documents(self, documents, embedding):
         """
         Create a vector store from documents using the provided embedding.
@@ -76,12 +79,10 @@ class VectorDB:
     def load_db(self, embedding):
         if self.db_type == "faiss":
             self._vector_store = FAISS.load_local(os.path.join("../", self.persist_path),
-                                                 embedding,
-                                                 allow_dangerous_deserialization=True)
+                                                  embedding,
+                                                  allow_dangerous_deserialization=True)
         elif self.db_type == "chroma":
             self._vector_store = Chroma(
                 persist_directory=self.persist_path,
                 embedding_function=embedding
             )
-
-        return

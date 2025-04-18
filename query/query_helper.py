@@ -7,7 +7,7 @@ from query.prompts import (
     AMBIGUOUS_PROMPT,
     SUMMARIZE_CONVERSATION_PROMPT,
     GRAMMAR_FIX_PROMPT,
-    LLM_AS_JUDGE_ACC_PROMPT, LLM_AS_JUDGE_REL_PROMPT, SUMMARIZE_DOCUMENT_PROMPT
+    LLM_AS_JUDGE_ACC_PROMPT, LLM_AS_JUDGE_REL_PROMPT, SUMMARIZE_DOCUMENT_PROMPT, SUMMARY_QUERY_COMBINE_PROMPT
 )
 
 
@@ -23,7 +23,11 @@ class QueryHelper:
         Args:
             llm: A language model client.
         """
-        self.llm = llm
+        self._llm = llm
+
+    @property
+    def llm(self):
+        return self._llm
 
     def _run_query(self, prompt: str) -> str:
         """
@@ -35,8 +39,8 @@ class QueryHelper:
         Returns:
             The content of the response as a string
         """
-        response, _ = self.llm.query(prompt)
-        self.llm.initialize_history()
+        response, _ = self._llm.query(prompt)
+        self._llm.initialize_history()
         return response.content
 
     def classify_query_topic(self, query: str) -> List[str]:
@@ -103,14 +107,11 @@ class QueryHelper:
         Returns:
             A combined string with summary and query
         """
-        # Using the prompt might alter the user query based on the history,
-        # which can lead to an undesirable effect
+        #Using the prompt might alter the user query based on the history,
+        #which can lead to an undesirable effect
 
-        # query_prompt = SUMMARY_QUERY_COMBINE_PROMPT.format(summary=summary, query=query)
-        # return self._run_query(query_prompt)
-
-        # Simple combination approach
-        return f"Summary: {summary}\nQuery: {query}"
+        query_prompt = SUMMARY_QUERY_COMBINE_PROMPT.format(conversation_history=summary, query=query)
+        return self._run_query(query_prompt)
 
     def fix_grammar_query(self, query: str) -> str:
         """

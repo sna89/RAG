@@ -49,6 +49,10 @@ def load_config() -> Dict[str, Any]:
 
     # QA system configuration
     qa_config = {
+        "fix_grammar": False,
+        "ambiguous": False,
+        "query_translation_type": "base",  # base, multi_query, #rag_fusion
+        "filter_by_topic": False,
         "ambiguous_threshold": 0.8
     }
 

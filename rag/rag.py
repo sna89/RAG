@@ -1,25 +1,28 @@
 import os
 
 import openai
+from langchain_openai import ChatOpenAI
 from langchain_unstructured import UnstructuredLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from config import load_config
 from core.embedding.openai_embedding import OpenAIEmbeddingClient
 from core.embedding.embedding_client import EmbeddingClient
-from typing import List, Tuple, Optional, Any, Dict
+from typing import List, Tuple, Optional, Any, Union
 
 from core.llm.llm_chat import LLMChat
 from core.vector_db.vector_db import VectorDB
 from query.query_helper import QueryHelper
 from langchain.schema import Document
 
+from rag.utils import get_unique_union
+
 
 class RAG:
     def __init__(
             self,
             query_helper: QueryHelper,
-            embedding: EmbeddingClient = EmbeddingClient,
+            embedding_client: EmbeddingClient = EmbeddingClient,
             vector_db: Any = None,
             top_k: int = 10,
             persist_path: str = "persist.db",
@@ -32,7 +35,7 @@ class RAG:
 
         Args:
             query_helper: query_helper for applying llm queries
-            embedding: Embedding client for transforming text to vector representation
+            embedding_client: Embedding client for transforming text to vector representation
             vector_db: index vector_db for storing and retrieving embeddings
             top_k: Number of results to return in queries
             persist_path: Path to save/load the vector database
@@ -43,7 +46,7 @@ class RAG:
         self.query_helper = query_helper
 
         # Initialize embedding client
-        self.embedding = embedding
+        self.embedding_client = embedding_client
 
         # initialize vector db
         self.vector_db = vector_db
@@ -166,13 +169,13 @@ class RAG:
         Args:
             split_documents: List of document chunks to index
         """
-        self.vector_db.from_documents(split_documents, self.embedding.embeddings)
+        self.vector_db.from_documents(split_documents, self.embedding_client.embeddings)
         self.vector_store = self.vector_db.vector_store
 
     def _load_db(self) -> None:
         """Load the vector database from disk."""
 
-        self.vector_db.load_db(self.embedding.embeddings)
+        self.vector_db.load_db(self.embedding_client.embeddings)
         self.vector_store = self.vector_db.vector_store
 
     def add_documents(self, path: str) -> bool:
@@ -195,7 +198,7 @@ class RAG:
             print("Need to create index DB before adding data.")
             return False
 
-    def query_similarity(self, query_text: str) -> Optional[List[Tuple[Any, float]]]:
+    def query_similarity(self, query_text: Union[str, List[str]]) -> Optional[List[Tuple[Any, float]]]:
         """
         Query the vector database for similar documents.
 
@@ -205,11 +208,23 @@ class RAG:
         Returns:
             List of (document, similarity_score) tuples or None if database isn't ready
         """
-        results = None
+        results = []
         if self.vector_store:
-            results = self.vector_store.similarity_search_with_score(query_text, k=self.top_k)
+
+            if isinstance(query_text, str):
+                results = self.vector_store.similarity_search_with_score(query_text, k=self.top_k)
+                results = [result[0].page_content for result in results]
+
+            elif isinstance(query_text, List):
+                for query in query_text:
+                    results.extend(self.vector_store.similarity_search_with_score(query, k=self.top_k))
+
+                results = get_unique_union(results)
+                results = [result.page_content for result in results]
+
         else:
             print("Error applying query similarity. Need to create index.")
+
         return results
 
     def update_top_k(self, top_k: int) -> None:
@@ -223,28 +238,28 @@ class RAG:
             self.top_k = top_k
 
 
-def initilize_rag_components(config):
+def initialize_rag_components(config):
     # Initialize LLM components
     llm_config = config["core_config"]["llm_config"]
-    query_llm = LLMChat(**llm_config)
+    query_llm = LLMChat(llm_config["model_name"], ChatOpenAI(**llm_config))
     query_helper = QueryHelper(query_llm)
 
-    embedding = None
+    embedding_client = None
     embedding_config = config["core_config"]["embedding_model"]
     if embedding_config["provider"] == "openai":
-        embedding = OpenAIEmbeddingClient(embedding_config["model_name"])
+        embedding_client = OpenAIEmbeddingClient(embedding_config["model_name"])
 
     vector_db_conf = config["core_config"]["vector_db"]
     vector_db = VectorDB(**vector_db_conf)
-
-    return query_helper, embedding, vector_db
+    vector_db.load_db(embedding_client.embeddings)
+    return query_helper, embedding_client, vector_db
 
 
 if __name__ == "__main__":
     config = load_config()
 
     openai.api_key = config["env_config"]["openai_api_key"]
-    query_helper, embedding, vector_db = initilize_rag_components(config)
+    query_helper, embedding, vector_db = initialize_rag_components(config)
 
     rag = RAG(query_helper,
               embedding,

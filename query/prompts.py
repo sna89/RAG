@@ -16,14 +16,34 @@ This module contains prompt templates organized by functionality:
 RAG_PROMPT = """
     RAG_PROMPT = You are an assistant for question-answering tasks. Use the following pieces of retrieved context to 
     answer the question. If you don't know the answer, just say that you don't know. 
+    
+    If the question is composed of several questions, follow this step-by-step reasoning process:
+    1. Identify each distinct question within the user's query
+    2. For each identified question:
+       a. State the specific question being addressed
+       b. Analyze what information is needed to answer it
+       c. Examine the relevant retrieved documents for this specific question
+       d. Reason through the answer by connecting the information to the question
+       e. Formulate a clear conclusion for this specific question
+    3. After addressing each question individually, synthesize the separate answers into a cohesive summary that 
+    addresses the overall query
+    4. Ensure the final response maintains logical connections between the individual questions
+    
     Use maximum three sentences, but try to answer in exactly one sentence, and keep the answer short and concise.
     In addition, don't add information that is not relevant to the current question.
-    If the questions is composed of several questions, break the questions and answer each one sequentially. 
-    Meaning, first the first question, then the second question, and so on. 
+    
     Question: {question} 
     Context: {context} 
     Answer:
     """
+
+MULTIQUERY_PROMPT = """
+You are an AI language model assistant. Your task is to generate five 
+different versions of the given user question to retrieve relevant documents from a vector 
+database. By generating multiple perspectives on the user question, your goal is to help
+the user overcome some of the limitations of the distance-based similarity search. 
+Provide these alternative questions separated by newlines. Original question: {question}
+"""
 
 # ==============================
 # Classification Prompts
@@ -217,25 +237,44 @@ SUMMARIZE_DOCUMENT_PROMPT = """
     Summary:
 """
 
-SUMMARY_QUERY_COMBINE_PROMPT = """
-    You are a professional assistant that takes a conversation summary and a new user query, and combines them into 
-    a single, coherent, and context-rich instruction, that will be sent to an LLM.
-    
-    Your task is to: Read the provided summary of a previous human-LLM interaction. Read the user’s new query. 
-    Combine both into a well-written prompt or instruction that includes the relevant context from the summary and 
-    leads naturally into the new question. Ensure the final output sounds like a single, continuous prompt — not two 
-    separate parts. Avoid redundancy and include only what’s necessary for clarity. 
-    
-    Present the query as it is meant for querying the LLM.
-    
-    Summary:
-    {summary}
-      
-    New User Query:
-    {query}
+# SUMMARY_QUERY_COMBINE_PROMPT = """
+#     You are a professional assistant that takes a conversation summary and a new user query, and combines them into
+#     a single, coherent, and context-rich instruction, that will be sent to an LLM.
+#
+#     Your task is to generate an optimized search query that will retrieve the most relevant
+#     documents from the knowledge base.
+#
+#     CONVERSATION HISTORY:
+#     {conversation_history}
+#
+#     NEW USER QUERY:
+#     {query}
+#
+#     Instructions:
+#     1. Extract key topics, entities, and information needs from both the conversation history and new query
+#     2. Identify how the new query relates to or builds upon previous exchanges
+#     3. Determine if the new query introduces new topics or is requesting clarification/elaboration on previously
+#     discussed topics
+#     4. Synthesize a comprehensive search query that captures the full context of the user's information need
+#     5. Include essential keywords, technical terms, and any specific constraints mentioned in the conversation
+#
+#     OUTPUT:
+#     Generate an optimized search query that will retrieve the most relevant documents to answer the user's
+#     current question in context.
+#     """
 
-    Output:
+SUMMARY_QUERY_COMBINE_PROMPT = """
+    Given a chat history and the latest user question which might reference context in the chat history, 
+    formulate a standalone question which can be understood without the chat history. 
+    Do NOT answer the question, just reformulate it if needed and otherwise return it as is.
+        
+    chat_summary_history:
+    {conversation_history}
+    
+    query:
+    {query}
 """
+
 
 # ==============================
 # Evaluation Prompts
